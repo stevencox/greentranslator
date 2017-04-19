@@ -16,9 +16,14 @@ This package provides an interface for interacting with Green team services:
 
 ## Approach
 
-We have a smartAPI for the Exposures service, another is under active development for the Clinical service, and we're determining which operations on the Medical BioChemical data should be sourced from existing services like [mygene.info](http://mygene.info/v3/api) vs sourced from data sets like chem2bio2rdf.
+We have a smartAPI for the Exposures service and another is under active development for the Clinical service.
 
-For ease of use at the Hackathon, we're also providing a simple Python library interface to Green team services.
+We're determining which operations on the Medical BioChemical data should be sourced from existing services like [mygene.info](http://mygene.info/v3/api) vs sourced from data sets like chem2bio2rdf or some existing smartAPI. Depending on the outcome, we may create a third smartAPI for medical-biochemical knowledge or source the data externally.
 
+For ease of use at the Hackathon, we're providing a simple Python library interface to Green team services. It can be installed with:
+   ```
+   pip install greentranslator
+   ```
+   
 The current notebook exercises existing services to gather building blocks for executing the queries above.
 
