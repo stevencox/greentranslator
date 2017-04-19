@@ -1,0 +1,9 @@
+prefix db_resource: <http://chem2bio2rdf.org/drugbank/resource/>
+prefix omim:        <http://chem2bio2rdf.org/omim/resource/>
+select distinct ?disease ?generic_name where {
+   ?drug        db_resource:Generic_Name ?generic_name .
+   ?disease_rec omim:drug                ?drug ;
+                omim:Name                ?disease .
+   filter regex(?disease, "${disease}", "i")
+}
+

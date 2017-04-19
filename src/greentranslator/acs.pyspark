@@ -1,0 +1,25 @@
+print (sqlContext)
+
+class ACSLoader(object):
+    def __init__(self, path, table, sample_size=1.0):
+        self.path = path
+        self.rdd = self.load (sample_size=sample_size)
+        self.rdd.toDF().registerTempTable (table)
+    def load (self, sample_size=1.0):
+        print (self.path)
+        return sqlContext.read.                                     \
+            format('com.databricks.spark.csv').                     \
+            options(comment='#').                                   \
+            options(delimiter=",").                                 \
+            options(header='true').                                 \
+            load(self.path).rdd.                                   \
+            sample (False, sample_size, 1234)
+acs = ACSLoader (
+    path = "/projects/stars/translator/var/acs/dataworld/uscensusbureau-acs-2015-5-e-income/data/USA_All_States.csv",
+    table = "acs_income")
+
+
+sqlContext.sql ("SELECT B19037A_041, B19037E_036 from acs_income")
+
+'''
+'''
