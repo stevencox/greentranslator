@@ -76,7 +76,7 @@ class MedicalBioChemical(object):
         """ Execute and return the result of a SPARQL query. """
         return self.triplestore.execute_query (query)
 
-    def get_exposure_conditions (self, stressorAgentIDs):
+    def get_exposure_conditions0 (self, stressorAgentIDs):
         """ Identify conditions (MeSH IDs) triggered by the specified stressor agent ids (also MeSH IDs).
         :param stressorAgentIDs: List of IDs for stressor agent substances.
         :type stressorAgentIDs: list of MeSH IDs, eg. D052638
@@ -87,6 +87,24 @@ class MedicalBioChemical(object):
         return list(map (lambda b : {
             "stressorAgentName" : b['stressorAgentName'].value,
             "conditionID"       : b['diseaseID'].value
+        },
+                         results.bindings))
+
+    def get_exposure_conditions (self, chemicals):
+        """ Identify conditions (MeSH IDs) triggered by the specified stressor agent ids (also MeSH IDs).
+        :param chemicals: List of IDs for substances of interest.
+        :type chemicals: list of MeSH IDs, eg. D052638
+        """
+        id_list = ' '.join (list(map (lambda d : "( mesh:{0} )".format (d), chemicals)))
+        text = self.get_template ("ctd_gene_expo_disease").safe_substitute (chemicals=id_list)
+        results = self.triplestore.execute_query (text)
+        return list(map (lambda b : {
+            "chemical" : b['chemical'].value,
+            "gene"     : b['gene'].value,
+            "pathway"  : b['kegg_pathway'].value,
+            "pathName" : b['pathway_name'].value,
+            "pathID"   : b['pathway_id'].value,
+            "is_human" : '(human)' in b['pathway_name'].value
         },
                          results.bindings))
         
