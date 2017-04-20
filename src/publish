@@ -16,8 +16,8 @@ setup(
       author = 'Steve Cox',
       author_email = 'scox@renci.org',
       include_package_data=True,
-      url = 'https://github.com/ResearchSoftwareInstitute/greendatatranslator',
-      download_url = 'https://github.com/ResearchSoftwareInstitute/greendatatranslator/archive/$version.tar.gz',
+      url = 'https://github.com/stevencox/greentranslator.git',
+      download_url = 'https://github.com/stevencox/greentranslator/archive/$version.tar.gz',
       keywords = [ 'biomedical', 'environmental', 'exposure', 'clinical' ],
       classifiers = [ ],
     )

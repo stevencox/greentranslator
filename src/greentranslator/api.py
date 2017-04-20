@@ -49,11 +49,12 @@ class Exposures (object):
         """
         result = None
         try:
-            result = self.exposures. \
+            result0 = self.exposures. \
                      exposures_exposure_type_coordinates_get(exposure_type,
                                                              latitude=latitude,
                                                              longitude=longitude,
                                                              radius=radius)
+            result = json.loads ("{}".format (result0).replace ("'", '"'))
         except ApiException as e:
             print("Exception when calling DefaultApi->exposures_exposure_type_coordinates_get: %s\n" % e)
         return result
@@ -74,13 +75,42 @@ class MedicalBioChemical(object):
     def query_biochem (self, query):
         """ Execute and return the result of a SPARQL query. """
         return self.triplestore.execute_query (query)
-    def get_drugs_by_disease (self, disease):
-        text = self.get_template ("get_drugs_by_disease").substitute (disease="asthma")
-        return self.triplestore.execute_query (text)
+
+    def get_exposure_conditions (self, stressorAgentIDs):
+        """ Identify conditions (MeSH IDs) triggered by the specified stressor agent ids (also MeSH IDs).
+        :param stressorAgentIDs: List of IDs for stressor agent substances.
+        :type stressorAgentIDs: list of MeSH IDs, eg. D052638
+        """
+        id_list = ' '.join (list(map (lambda d : "( mesh:{0} )".format (d), stressorAgentIDs)))
+        text = self.get_template ("expo_disease").safe_substitute (stressorAgentIDs=id_list)
+        results = self.triplestore.execute_query (text)
+        return list(map (lambda b : {
+            "stressorAgentName" : b['stressorAgentName'].value,
+            "conditionID"       : b['diseaseID'].value
+        },
+                         results.bindings))
+        
+    def get_drugs_by_condition (self, conditions):
+        """ Get drugs associated with a set of conditions.
+        :param conditions: Conditions to find associated drugs for.
+        :type conditions: List of MeSH IDs for conditions, eg.: D001249
+        """
+        condition_list = ' '.join (list(map (lambda d : "( mesh:{0} )".format (d), conditions)))
+        text = self.get_template ("get_drugs_by_disease").substitute (conditions=condition_list)
+        results = self.triplestore.execute_query (text)
+        return list(map (lambda b : b['generic_name'].value, results.bindings))
+
     def get_genes_pathways_by_disease (self, diseases):
         diseaseMeshIDList = ' '.join (list(map (lambda d : "( mesh:{0} )".format (d), diseases)))
         text = self.get_template ("genes_pathways_by_disease").safe_substitute (diseaseMeshIDList=diseaseMeshIDList)
-        return self.triplestore.execute_query (text)
+        results = self.triplestore.execute_query (text)
+        return list(map (lambda b : {
+            "uniprot_gene" : b['uniprotGeneID'].value,
+            "kegg_path"    : b['keggPath'].value,
+            "path_name"    : b['pathwayName'].value,
+            "is_human"     : '(human)' in b['pathwayName'].value
+        },
+        results.bindings))
 
 class GreenTranslator (Translator):
 
