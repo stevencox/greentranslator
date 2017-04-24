@@ -104,7 +104,7 @@ class MedicalBioChemical(object):
             "pathway"  : b['kegg_pathway'].value,
             "pathName" : b['pathway_name'].value,
             "pathID"   : b['pathway_id'].value,
-            "is_human" : '(human)' in b['pathway_name'].value
+            "human"    : '(human)' in b['pathway_name'].value
         },
                          results.bindings))
         
@@ -123,10 +123,10 @@ class MedicalBioChemical(object):
         text = self.get_template ("genes_pathways_by_disease").safe_substitute (diseaseMeshIDList=diseaseMeshIDList)
         results = self.triplestore.execute_query (text)
         return list(map (lambda b : {
-            "uniprot_gene" : b['uniprotGeneID'].value,
-            "kegg_path"    : b['keggPath'].value,
-            "path_name"    : b['pathwayName'].value,
-            "is_human"     : '(human)' in b['pathwayName'].value
+            "uniprotGene" : b['uniprotGeneID'].value,
+            "keggPath"    : b['keggPath'].value,
+            "pathName"    : b['pathwayName'].value,
+            "human  "     : '(human)' in b['pathwayName'].value
         },
         results.bindings))
 
