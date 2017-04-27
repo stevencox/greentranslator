@@ -43,22 +43,49 @@ class Exposures (object):
     """ Services relating to environmental exposures. """
     def __init__(self, exposures):
         self.exposures = exposures
-    def get_exposure_by_area (self, exposure_type, latitude, longitude, radius):
-        """ get_exposure_score:
-            array of location/date parameters
-        """
-        result = None
-        try:
-            result0 = self.exposures. \
-                     exposures_exposure_type_coordinates_get(exposure_type,
-                                                             latitude=latitude,
-                                                             longitude=longitude,
-                                                             radius=radius)
-            result = json.loads ("{}".format (result0).replace ("'", '"'))
-        except ApiException as e:
-            print("Exception when calling DefaultApi->exposures_exposure_type_coordinates_get: %s\n" % e)
-        return result
 
+    def get_exposure_by_coordinates (self, exposure_type, latitude, longitude, radius):
+        """ Returns paginated list of available latitude, longitude coordinates for given exposure_type.
+            Optionally the user can provide a latitude, longitude coordinate with a radius in meters to
+            discover if an exposure location is within the requested range
+        :param exposure_type: Type of exposure (pm25, o3)
+        :param latitude: Float representing a latitude.
+        :param longitude: Float representing a longitude.
+        :param radius: Radius in meters."""
+        result = self.exposures. \
+                  exposures_exposure_type_coordinates_get(exposure_type,
+                                                          latitude=latitude,
+                                                          longitude=longitude,
+                                                          radius=radius)
+        return json.loads ("{}".format (result).replace ("'", '"'))
+
+    def get_exposure_scores (self, exposure_type, start_date, end_date, exposure_point):
+        """
+        Retrieve the computed exposure score(s) for a given environmental exposure factor, time period, and location(s)
+        :param exposure_type: The name of the exposure factor (pm25, o3)
+        :param start_date: The starting date to obtain exposures for (example 1985-04-12 is April 12th 1985). Time of day is ignored.
+        :param end_date: The ending date to obtain exposures for (example 1985-04-13 is April 13th 1985)
+        :param exposure_point: A description of the location(s) to retrieve the exposure for. Locaton may be a single geocoordinate (example '35.720278,-79.176389') or a semicolon separated list of geocoord:dayhours giving the start and ending hours on specific days of the week at that location (example '35.720278,-79.176389,Sa0813;35.720278,-79.176389,other') 
+        """
+        return self.exposures. \
+            exposures_exposure_type_scores_get (exposure_type = exposure_type,
+                                                start_date = start_date,
+                                                end_date = end_date,
+                                                exposure_point = exposure_point)
+
+    def get_exposure_values (self, exposure_type, start_date, end_date, exposure_point):
+        """
+        Retrieve the computed exposure value(s) for a given environmental exposure factor, time period, and location(s)
+        :param exposure_type: The name of the exposure factor (pm25, o3)
+        :param start_date: The starting date to obtain exposures for (example 1985-04-12 is April 12th 1985). Time of day is ignored.
+        :param end_date: The ending date to obtain exposures for (example 1985-04-13 is April 13th 1985)
+        :param exposure_point: A description of the location(s) to retrieve the exposure for. Locaton may be a single geocoordinate (example '35.720278,-79.176389') or a semicolon separated list of geocoord:dayhours giving the start and ending hours on specific days of the week at that location (example '35.720278,-79.176389,Sa0813;35.720278,-79.176389,other')
+        """
+        return self.exposures. \
+                exposures_exposure_type_values_get (exposure_type = exposure_type,
+                                                    start_date = start_date,
+                                                    end_date = end_date,
+                                                    exposure_point = exposure_point)
 class MedicalBioChemical(object):
     """ Generic service endpoints for medical and bio-chemical data. This set comprises portions of
     chem2bio2rdf, Monarch, and CTD environmental exposures."""
