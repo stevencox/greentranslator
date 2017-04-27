@@ -55,7 +55,7 @@ class Exposures (object):
     def __init__(self, exposures):
         self.exposures = exposures
 
-    def get_exposure_by_coordinates (self, exposure_type, latitude, longitude, radius):
+    def get_by_coordinates (self, exposure_type, latitude, longitude, radius):
         """ Returns paginated list of available latitude, longitude coordinates for given exposure_type.
             Optionally the user can provide a latitude, longitude coordinate with a radius in meters to
             discover if an exposure location is within the requested range
@@ -70,7 +70,7 @@ class Exposures (object):
                                                           radius=radius)
         return json.loads ("{}".format (result).replace ("'", '"'))
 
-    def get_exposure_scores (self, exposure_type, start_date, end_date, exposure_point):
+    def get_scores (self, exposure_type, start_date, end_date, exposure_point):
         """ Retrieve the computed exposure score(s) for a given environmental exposure factor, time period, and location(s)
 
         :param exposure_type: The name of the exposure factor (pm25, o3)
@@ -84,7 +84,7 @@ class Exposures (object):
                                                 end_date = end_date,
                                                 exposure_point = exposure_point)
 
-    def get_exposure_values (self, exposure_type, start_date, end_date, exposure_point):
+    def get_values (self, exposure_type, start_date, end_date, exposure_point):
         """ Retrieve the computed exposure value(s) for a given environmental exposure factor, time period, and location(s)
 
         :param exposure_type: The name of the exposure factor (pm25, o3)
@@ -181,46 +181,34 @@ class GreenTranslator (Translator):
         self.exposures = Exposures (swagger_client.DefaultApi ())
         self.medbiochem = MedicalBioChemical (self.blazegraph)
 
-    def get_medbiochem (self):
-        """ Get the Med-BioChem knowledge source. """
-        return self.medbiochem
-
-    def get_exposures (self):
-        """ Get the Exposure Service knowledge source. """
-        return self.exposures
-
 class TestExposures(unittest.TestCase):
+
+    translator = GreenTranslator ()
 
     def test_coordinates(self):
         print ("Get available exposure coordinates.")
-        translator = GreenTranslator ()
-        exposure = translator.\
-                   get_exposures().\
-                   get_exposure_by_coordinates (exposure_type = 'pm25',
-                                                latitude      = '',
-                                                longitude     = '',
-                                                radius        = '0')
+        exposure = self.translator.exposures. \
+                   get_by_coordinates (exposure_type = 'pm25',
+                                       latitude      = '',
+                                       longitude     = '',
+                                       radius        = '0')
         self.assertEqual (exposure[0]['latitude'], '35.7795897')
     def test_scores(self):
         print ("Get exposure scores.")
-        translator = GreenTranslator ()
-        scores = translator. \
-                 get_exposures(). \
-                 get_exposure_scores (exposure_type = 'pm25',
-                                      start_date = '2010-01-07',
-                                      end_date = '2010-01-31',
-                                      exposure_point = '35.9131996,-79.0558445')
+        scores = self.translator.exposures. \
+                 get_scores (exposure_type = 'pm25',
+                             start_date = '2010-01-07',
+                             end_date = '2010-01-31',
+                             exposure_point = '35.9131996,-79.0558445')
         self.assertEqual (scores[0].value, '4.714285714285714')
 
     def test_values(self):
         print ("Get exposure values")
-        translator = GreenTranslator ()
-        values = translator. \
-                 get_exposures(). \
-                 get_exposure_values (exposure_type = 'pm25',
-                                      start_date = '2010-01-07',
-                                      end_date = '2010-01-31',
-                                      exposure_point = '35.9131996,-79.0558445')
+        values = self.translator.exposures. \
+                 get_values (exposure_type = 'pm25',
+                             start_date = '2010-01-07',
+                             end_date = '2010-01-31',
+                             exposure_point = '35.9131996,-79.0558445')
         self.assertEqual (values[0].value, '17.7199974060059')
 
 class TestMedBioChem (unittest.TestCase):
@@ -228,23 +216,20 @@ class TestMedBioChem (unittest.TestCase):
 
     def test_drugs_by_condition (self):
         print ("Test get drugs by condition")
-        drugs = self.translator.\
-                get_medbiochem().\
+        drugs = self.translator.medbiochem.\
                 get_drugs_by_condition (conditions=[ "d001249" ])
         self.assertEqual (sorted(drugs)[0], '(11-BETA)-11,21-DIHYDROXY-PREGN-4-ENE-3,20-DIONE')
 
     def test_genes_pathways (self):
         print ("Test get genes/pathways by condition")
         conditions = [ 'd001249', 'd003371', 'd001249' ]
-        genes_paths = self.translator.\
-                      get_medbiochem().\
+        genes_paths = self.translator.medbiochem.\
                       get_genes_pathways_by_disease (diseases = conditions)
         self.assertEqual (genes_paths[0]['uniprotGene'], 'http://chem2bio2rdf.org/uniprot/resource/gene/ALDH2')
 
     def test_get_exposure_conditions (self):
         print ("Test get exposure conditions")
-        exposures = self.translator.\
-                    get_medbiochem().\
+        exposures = self.translator.medbiochem.\
                     get_exposure_conditions (chemicals = [ 'D052638' ])
         self.assertEqual (exposures[0]['chemical'], 'http://bio2rdf.org/mesh:D052638')
 
