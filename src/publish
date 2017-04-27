@@ -46,20 +46,9 @@ publish () {
     fi
     python -m pip --no-cache-dir install greentranslator==$version
 
- 
     cd ..
-    cat <<EOF> test.py
-from greentranslator.api import GreenTranslator
-translator = GreenTranslator()
-exposure = translator.get_exposure_by_area (exposure_type = 'pm25',
-                                            latitude      = '',
-                                            longitude     = '',
-                                            radius        = '0')
-print ("Exposure: {}".format (exposure))
-EOF
-    python test.py
+    python -m unittest greentranslator.api
 
-#    rm test.py
 }
 
 
