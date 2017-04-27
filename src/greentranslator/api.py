@@ -3,6 +3,7 @@ import logging
 import os
 import traceback
 import swagger_client
+import unittest
 from string import Template
 from swagger_client.rest import ApiException
 from SPARQLWrapper import SPARQLWrapper2, JSON
@@ -188,29 +189,64 @@ class GreenTranslator (Translator):
         """ Get the Exposure Service knowledge source. """
         return self.exposures
 
-    def test (self):
+class TestExposures(unittest.TestCase):
+
+    def test_coordinates(self):
+        print ("Get available exposure coordinates.")
         translator = GreenTranslator ()
-        exposure = translator.get_exposures().get_exposure_by_area (exposure_type = 'pm25',
-                                                                    latitude      = '',
-                                                                    longitude     = '',
-                                                                    radius        = '0')
-        print ("Exposure: {}".format (exposure))
-        
-        results = translator.get_medbiochem().get_drugs_by_disease ("asthma")
-        print ("Asthma drugs: {}".format (list(map (lambda b : b['generic_name'].value, results.bindings))))
-        
-        
-        results = translator.get_medbiochem().get_genes_pathways_by_disease (diseases = [ 'd001249', 'd003371', 'd001249' ])
-        
-        genes_paths = list(map (lambda b : "{0}->{1} ({2})".format (b['uniprotGeneID'].value,
-                                                                    b['keggPath'].value,
-                                                                    b['pathwayName'].value),
-                                results.bindings))
-        print ("Asthma genes/pathways:")
-        for g in genes_paths:
-            print (g)
+        exposure = translator.\
+                   get_exposures().\
+                   get_exposure_by_coordinates (exposure_type = 'pm25',
+                                                latitude      = '',
+                                                longitude     = '',
+                                                radius        = '0')
+        self.assertEqual (exposure[0]['latitude'], '35.7795897')
+    def test_scores(self):
+        print ("Get exposure scores.")
+        translator = GreenTranslator ()
+        scores = translator. \
+                 get_exposures(). \
+                 get_exposure_scores (exposure_type = 'pm25',
+                                      start_date = '2010-01-07',
+                                      end_date = '2010-01-31',
+                                      exposure_point = '35.9131996,-79.0558445')
+        self.assertEqual (scores[0].value, '4.714285714285714')
+
+    def test_values(self):
+        print ("Get exposure values")
+        translator = GreenTranslator ()
+        values = translator. \
+                 get_exposures(). \
+                 get_exposure_values (exposure_type = 'pm25',
+                                      start_date = '2010-01-07',
+                                      end_date = '2010-01-31',
+                                      exposure_point = '35.9131996,-79.0558445')
+        self.assertEqual (values[0].value, '17.7199974060059')
+
+class TestMedBioChem (unittest.TestCase):
+    translator = GreenTranslator ()
+
+    def test_drugs_by_condition (self):
+        print ("Test get drugs by condition")
+        drugs = self.translator.\
+                get_medbiochem().\
+                get_drugs_by_condition (conditions=[ "d001249" ])
+        self.assertEqual (sorted(drugs)[0], '(11-BETA)-11,21-DIHYDROXY-PREGN-4-ENE-3,20-DIONE')
+
+    def test_genes_pathways (self):
+        print ("Test get genes/pathways by condition")
+        conditions = [ 'd001249', 'd003371', 'd001249' ]
+        genes_paths = self.translator.\
+                      get_medbiochem().\
+                      get_genes_pathways_by_disease (diseases = conditions)
+        self.assertEqual (genes_paths[0]['uniprotGene'], 'http://chem2bio2rdf.org/uniprot/resource/gene/ALDH2')
+
+    def test_get_exposure_conditions (self):
+        print ("Test get exposure conditions")
+        exposures = self.translator.\
+                    get_medbiochem().\
+                    get_exposure_conditions (chemicals = [ 'D052638' ])
+        self.assertEqual (exposures[0]['chemical'], 'http://bio2rdf.org/mesh:D052638')
 
 if __name__ == '__main__':
-    from greentranslator.api import GreenTranslator
-    translator = GreenTranslator ()
-    translator.test ()
+    unittest.main()
