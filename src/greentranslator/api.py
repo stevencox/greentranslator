@@ -21,10 +21,20 @@ class TripleStore(object):
     def __init__(self, hostname):
         self.service =  SPARQLWrapper2 (hostname)
     def execute_query (self, query):
+        """ Execute a SPARQL query.
+
+        :param query: A SPARQL query.
+        :return: Returns a JSON formatted object.
+        """
         self.service.setQuery (query)
         self.service.setReturnFormat (JSON)
         return self.service.query().convert ()
     def execute_query_file (self, query_file):
+        """ Execute a SPARQL query based on a file.
+
+        :param query_file: The file containing th query.
+        :return: Returns a JSON formatted object.
+        """
         result = None
         with open (query_file, "r") as stream:
             query = stream.read ()
@@ -60,8 +70,8 @@ class Exposures (object):
         return json.loads ("{}".format (result).replace ("'", '"'))
 
     def get_exposure_scores (self, exposure_type, start_date, end_date, exposure_point):
-        """
-        Retrieve the computed exposure score(s) for a given environmental exposure factor, time period, and location(s)
+        """ Retrieve the computed exposure score(s) for a given environmental exposure factor, time period, and location(s)
+
         :param exposure_type: The name of the exposure factor (pm25, o3)
         :param start_date: The starting date to obtain exposures for (example 1985-04-12 is April 12th 1985). Time of day is ignored.
         :param end_date: The ending date to obtain exposures for (example 1985-04-13 is April 13th 1985)
@@ -74,8 +84,8 @@ class Exposures (object):
                                                 exposure_point = exposure_point)
 
     def get_exposure_values (self, exposure_type, start_date, end_date, exposure_point):
-        """
-        Retrieve the computed exposure value(s) for a given environmental exposure factor, time period, and location(s)
+        """ Retrieve the computed exposure value(s) for a given environmental exposure factor, time period, and location(s)
+
         :param exposure_type: The name of the exposure factor (pm25, o3)
         :param start_date: The starting date to obtain exposures for (example 1985-04-12 is April 12th 1985). Time of day is ignored.
         :param end_date: The ending date to obtain exposures for (example 1985-04-13 is April 13th 1985)
@@ -103,22 +113,9 @@ class MedicalBioChemical(object):
         """ Execute and return the result of a SPARQL query. """
         return self.triplestore.execute_query (query)
 
-    def get_exposure_conditions0 (self, stressorAgentIDs):
-        """ Identify conditions (MeSH IDs) triggered by the specified stressor agent ids (also MeSH IDs).
-        :param stressorAgentIDs: List of IDs for stressor agent substances.
-        :type stressorAgentIDs: list of MeSH IDs, eg. D052638
-        """
-        id_list = ' '.join (list(map (lambda d : "( mesh:{0} )".format (d), stressorAgentIDs)))
-        text = self.get_template ("expo_disease").safe_substitute (stressorAgentIDs=id_list)
-        results = self.triplestore.execute_query (text)
-        return list(map (lambda b : {
-            "stressorAgentName" : b['stressorAgentName'].value,
-            "conditionID"       : b['diseaseID'].value
-        },
-                         results.bindings))
-
     def get_exposure_conditions (self, chemicals):
         """ Identify conditions (MeSH IDs) triggered by the specified stressor agent ids (also MeSH IDs).
+
         :param chemicals: List of IDs for substances of interest.
         :type chemicals: list of MeSH IDs, eg. D052638
         """
@@ -137,6 +134,7 @@ class MedicalBioChemical(object):
         
     def get_drugs_by_condition (self, conditions):
         """ Get drugs associated with a set of conditions.
+
         :param conditions: Conditions to find associated drugs for.
         :type conditions: List of MeSH IDs for conditions, eg.: D001249
         """
@@ -146,6 +144,11 @@ class MedicalBioChemical(object):
         return list(map (lambda b : b['generic_name'].value, results.bindings))
 
     def get_genes_pathways_by_disease (self, diseases):
+        """ Get genes and pathways associated with specified conditions.
+        
+        :param diseases: List of conditions designated by MeSH ID.
+        :return: Returns a list of dicts containing gene and path information.
+        """
         diseaseMeshIDList = ' '.join (list(map (lambda d : "( mesh:{0} )".format (d), diseases)))
         text = self.get_template ("genes_pathways_by_disease").safe_substitute (diseaseMeshIDList=diseaseMeshIDList)
         results = self.triplestore.execute_query (text)
@@ -160,6 +163,11 @@ class MedicalBioChemical(object):
 class GreenTranslator (Translator):
 
     def __init__(self, name="greentranslator", config={}):
+        """Initialize the GreenTranslator.
+
+        :param config: Dict of configuration options. Empty by default. 'blaze_uri' can be configured to the SPARQL
+                       endpoint for the Med-BioChem service.
+        """
         Translator.__init__(self, name)
         self.config = config
         blaze_uri = None
@@ -173,9 +181,11 @@ class GreenTranslator (Translator):
         self.medbiochem = MedicalBioChemical (self.blazegraph)
 
     def get_medbiochem (self):
+        """ Get the Med-BioChem knowledge source. """
         return self.medbiochem
 
     def get_exposures (self):
+        """ Get the Exposure Service knowledge source. """
         return self.exposures
 
     def test (self):
