@@ -20,9 +20,25 @@ We have a smartAPI for the Exposures service and another is under active develop
 
 We're determining which operations on the Medical BioChemical data should be sourced from existing services like [mygene.info](http://mygene.info/v3/api) vs sourced from data sets like chem2bio2rdf or some existing smartAPI. Depending on the outcome, we may create a third smartAPI for medical-biochemical knowledge or source the data externally.
 
-For ease of use at the Hackathon, we're providing a simple Python library interface to Green team services. It can be installed with:
+### Installation
+
+For ease of use at the Hackathon, we're providing a simple Python library interface to Green team services. It can be installed and tested like this:
    ```
-   pip install greentranslator
+   $ cd dev
+   (venv3)$ source setup.sh
+   (venv3)$ pip install greentranslator
+   (venv3)$ pip -m unittest greentranslator.api
+   Get available exposure coordinates.
+   .Get exposure scores.
+   .Get exposure values
+   .Test get drugs by condition
+   .Test get genes/pathways by condition
+   .Test get exposure conditions
+   .
+   ----------------------------------------------------------------------
+   Ran 6 tests in 4.563s
+
+   OK
    ```
    
 The current notebook exercises existing services to gather building blocks for executing the queries above.
