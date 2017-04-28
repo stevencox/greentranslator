@@ -41,5 +41,16 @@ For ease of use at the Hackathon, we're providing a simple Python library interf
    OK
    ```
    
+After this, Jupyter can be added like this:
+
+```
+pip install jupyter
+```
+And run with 
+```
+jupyter notebook --ip=0.0.0.0
+```
+
+
 The current notebook exercises existing services to gather building blocks for executing the queries above.
 
