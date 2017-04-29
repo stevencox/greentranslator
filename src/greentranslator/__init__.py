@@ -1,4 +1,4 @@
-from greentranslator import api
-from .swagger_client import *
+#from greentranslator import api
+#from .swagger_client import *
 
 
