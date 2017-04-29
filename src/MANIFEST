@@ -12,6 +12,7 @@ greentranslator/query/expo_disease.sparql
 greentranslator/query/genes_pathways_by_disease.sparql
 greentranslator/query/get_drugs_by_disease.sparql
 greentranslator/swagger_client/__init__.py
+greentranslator/swagger_client/__init__.py~
 greentranslator/swagger_client/api_client.py
 greentranslator/swagger_client/configuration.py
 greentranslator/swagger_client/rest.py
