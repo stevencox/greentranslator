@@ -9,7 +9,7 @@ setup(
          'swagger_client/models/*',
          'swagger_client/apis/*'
       ]},
-      version = '0.32',
+      version = '0.33',
       description = 'Green Team BioMedical Data Translator',
       author = 'Steve Cox',
       author_email = 'scox@renci.org',
@@ -24,11 +24,12 @@ setup(
          'pandas==0.19.2',
          'prov==1.5.0',
          'pydotplus==2.0.2',
-         'seaborn==0.7.1'
+         'seaborn==0.7.1',
+         'SPARQLWrapper==1.8.0'
       ],
       include_package_data=True,
       url = 'https://github.com/stevencox/greentranslator.git',
-      download_url = 'https://github.com/stevencox/greentranslator/archive/0.32.tar.gz',
+      download_url = 'https://github.com/stevencox/greentranslator/archive/0.33.tar.gz',
       keywords = [ 'biomedical', 'environmental', 'exposure', 'clinical' ],
       classifiers = [ ],
     )
