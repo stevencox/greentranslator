@@ -4,8 +4,10 @@ import os
 import traceback
 import unittest
 from string import Template
-from .swagger_client import DefaultApi
-from .swagger_client.rest import ApiException
+#from .swagger_client import DefaultApi
+#from .swagger_client.rest import ApiException
+from exposures_client import DefaultApi
+from exposures_client.rest import ApiException
 from SPARQLWrapper import SPARQLWrapper2, JSON
 from greentranslator.provenance import provenance
 from greentranslator.provenance import ProvenanceQuery
