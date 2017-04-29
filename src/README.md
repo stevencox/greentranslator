@@ -27,7 +27,7 @@ For ease of use at the Hackathon, we're providing a simple Python library interf
    $ cd dev
    (venv3)$ source setup.sh
    (venv3)$ pip install greentranslator
-   (venv3)$ pip -m unittest greentranslator.api
+   (venv3)$ python -m unittest greentranslator.api
    Get available exposure coordinates.
    .Get exposure scores.
    .Get exposure values
@@ -41,5 +41,16 @@ For ease of use at the Hackathon, we're providing a simple Python library interf
    OK
    ```
    
+After this, Jupyter can be added like this:
+
+```
+pip install jupyter
+```
+And run with 
+```
+jupyter notebook --ip=0.0.0.0
+```
+
+
 The current notebook exercises existing services to gather building blocks for executing the queries above.
 
