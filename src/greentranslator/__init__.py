@@ -1,3 +1,4 @@
 from greentranslator import api
-__all__ = [ 'swagger_client' ]
+from .swagger_client import *
+
 
