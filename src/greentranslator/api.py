@@ -7,6 +7,8 @@ import unittest
 from string import Template
 from swagger_client.rest import ApiException
 from SPARQLWrapper import SPARQLWrapper2, JSON
+from greentranslator.provenance import provenance
+from greentranslator.provenance import ProvenanceQuery
 
 class LoggingUtil(object):
     """ Logging utility controlling format and setting initial logging level """
@@ -21,6 +23,8 @@ class TripleStore(object):
     """ Connect to a SPARQL endpoint and provide services for loading and executing queries."""
     def __init__(self, hostname):
         self.service =  SPARQLWrapper2 (hostname)
+
+    @provenance()
     def execute_query (self, query):
         """ Execute a SPARQL query.
 
@@ -51,6 +55,7 @@ class Translator (DataLake):
         DataLake.__init__(self, name)
 
 class Exposures (object):
+
     """ Services relating to environmental exposures. """
     def __init__(self, exposures):
         self.exposures = exposures
@@ -97,7 +102,7 @@ class Exposures (object):
                                                     start_date = start_date,
                                                     end_date = end_date,
                                                     exposure_point = exposure_point)
-class MedicalBioChemical(object):
+class BioChemical(object):
     """ Generic service endpoints for medical and bio-chemical data. This set comprises portions of
     chem2bio2rdf, Monarch, and CTD environmental exposures."""
     def __init__(self, triplestore):
@@ -110,6 +115,7 @@ class MedicalBioChemical(object):
             query = Template (text)
             logger.debug ('query template: {0}', query)
         return query
+    @provenance()
     def query_biochem (self, query):
         """ Execute and return the result of a SPARQL query. """
         return self.triplestore.execute_query (query)
@@ -161,6 +167,74 @@ class MedicalBioChemical(object):
         },
         results.bindings))
 
+class GreenQuery(ProvenanceQuery):
+
+    def __init__(self, translator):
+        ProvenanceQuery.__init__(self)
+        self.translator = translator
+
+    @provenance()
+    def query_biochem (self, query):
+        """ Execute and return the result of a SPARQL query. """
+        return self.translator.biochem.query_biochem (query)
+
+    @provenance()
+    def get_exposure_conditions (self, chemicals):
+        """ Identify conditions (MeSH IDs) triggered by the specified stressor agent ids (also MeSH IDs).
+
+        :param chemicals: List of IDs for substances of interest.
+        :type chemicals: list of MeSH IDs, eg. D052638
+        """
+        return self.translator.biochem.get_exposure_conditions (chemicals)
+        
+    @provenance()
+    def get_drugs_by_condition (self, conditions):
+        """ Get drugs associated with a set of conditions.
+
+        :param conditions: Conditions to find associated drugs for.
+        :type conditions: List of MeSH IDs for conditions, eg.: D001249
+        """
+        return self.translator.biochem.get_drugs_by_condition (conditions)
+
+    @provenance()
+    def get_genes_pathways_by_disease (self, diseases):
+        return self.translator.biochem.get_genes_pathways_by_disease (diseases)
+
+    @provenance()
+    def expo_get_by_coordinates (self, exposure_type, latitude, longitude, radius):
+        """ Returns paginated list of available latitude, longitude coordinates for given exposure_type.
+            Optionally the user can provide a latitude, longitude coordinate with a radius in meters to
+            discover if an exposure location is within the requested range
+        :param exposure_type: Type of exposure (pm25, o3)
+        :param latitude: Float representing a latitude.
+        :param longitude: Float representing a longitude.
+        :param radius: Radius in meters."""
+        return self.translator.exposures.get_by_coordinates (exposure_type = exposure_type,
+                                                             latitude = latitude,
+                                                             longitude = longitude,
+                                                             radius = radius)
+    @provenance()
+    def expo_get_scores (self, exposure_type, start_date, end_date, exposure_point):
+        """ Retrieve the computed exposure score(s) for a given environmental exposure factor, time period, and location(s)
+
+        :param exposure_type: The name of the exposure factor (pm25, o3)
+        :param start_date: The starting date to obtain exposures for (example 1985-04-12 is April 12th 1985). Time of day is ignored.
+        :param end_date: The ending date to obtain exposures for (example 1985-04-13 is April 13th 1985)
+        :param exposure_point: A description of the location(s) to retrieve the exposure for. Locaton may be a single geocoordinate (example '35.720278,-79.176389') or a semicolon separated list of geocoord:dayhours giving the start and ending hours on specific days of the week at that location (example '35.720278,-79.176389,Sa0813;35.720278,-79.176389,other') 
+        """
+        return self.translator.exposures.get_scores (exposure_type=exposure_type,
+                                                     start_date=start_date,
+                                                     end_date=end_date,
+                                                     exposure_point=exposure_point)
+
+    @provenance()
+    def expo_get_values (self, exposure_type, start_date, end_date, exposure_point):
+        return self.translator.exposures.get_values (exposure_type = exposure_type,
+                                                     start_date = start_date,
+                                                     end_date = end_date,
+                                                     exposure_point = exposure_point)
+
+
 class GreenTranslator (Translator):
 
     def __init__(self, name="greentranslator", config={}):
@@ -179,59 +253,60 @@ class GreenTranslator (Translator):
         self.blazegraph = TripleStore (blaze_uri)
         #self.exposures_uri = self.config ['exposures_uri']
         self.exposures = Exposures (swagger_client.DefaultApi ())
-        self.medbiochem = MedicalBioChemical (self.blazegraph)
+        self.biochem = BioChemical (self.blazegraph)
+
+    def get_query (self):
+        return GreenQuery (translator=self)
 
 class TestExposures(unittest.TestCase):
-
-    translator = GreenTranslator ()
-
+    query = GreenTranslator().get_query ()
     def test_coordinates(self):
         print ("Get available exposure coordinates.")
-        exposure = self.translator.exposures. \
-                   get_by_coordinates (exposure_type = 'pm25',
-                                       latitude      = '',
-                                       longitude     = '',
-                                       radius        = '0')
+        exposure = self.query. \
+                   expo_get_by_coordinates (exposure_type = 'pm25',
+                                            latitude      = '',
+                                            longitude     = '',
+                                            radius        = '0')
         self.assertEqual (exposure[0]['latitude'], '35.7795897')
     def test_scores(self):
         print ("Get exposure scores.")
-        scores = self.translator.exposures. \
-                 get_scores (exposure_type = 'pm25',
-                             start_date = '2010-01-07',
-                             end_date = '2010-01-31',
-                             exposure_point = '35.9131996,-79.0558445')
+        scores = self.query. \
+                 expo_get_scores (exposure_type = 'pm25',
+                                  start_date = '2010-01-07',
+                                  end_date = '2010-01-31',
+                                  exposure_point = '35.9131996,-79.0558445')
         self.assertEqual (scores[0].value, '4.714285714285714')
-
     def test_values(self):
         print ("Get exposure values")
-        values = self.translator.exposures. \
-                 get_values (exposure_type = 'pm25',
-                             start_date = '2010-01-07',
-                             end_date = '2010-01-31',
-                             exposure_point = '35.9131996,-79.0558445')
+        values = self.query. \
+                 expo_get_values (exposure_type = 'pm25',
+                                  start_date = '2010-01-07',
+                                  end_date = '2010-01-31',
+                                  exposure_point = '35.9131996,-79.0558445')
         self.assertEqual (values[0].value, '17.7199974060059')
+    def test_show_provenance (self):
+        print (self.query.prov_json ())
 
-class TestMedBioChem (unittest.TestCase):
-    translator = GreenTranslator ()
-
+class TestBioChem (unittest.TestCase):
+    query = GreenTranslator().get_query ()
     def test_drugs_by_condition (self):
         print ("Test get drugs by condition")
-        drugs = self.translator.medbiochem.\
+        drugs = self.query. \
                 get_drugs_by_condition (conditions=[ "d001249" ])
         self.assertEqual (sorted(drugs)[0], '(11-BETA)-11,21-DIHYDROXY-PREGN-4-ENE-3,20-DIONE')
-
     def test_genes_pathways (self):
         print ("Test get genes/pathways by condition")
         conditions = [ 'd001249', 'd003371', 'd001249' ]
-        genes_paths = self.translator.medbiochem.\
-                      get_genes_pathways_by_disease (diseases = conditions)
-        self.assertEqual (genes_paths[0]['uniprotGene'], 'http://chem2bio2rdf.org/uniprot/resource/gene/ALDH2')
-
+        genes_paths = self.query.get_genes_pathways_by_disease (diseases = conditions)
+        genes = sorted (map(lambda gp: gp['uniprotGene'], genes_paths))
+        self.assertEqual (genes[0], 'http://chem2bio2rdf.org/uniprot/resource/gene/ABCB1')
     def test_get_exposure_conditions (self):
         print ("Test get exposure conditions")
-        exposures = self.translator.medbiochem.\
-                    get_exposure_conditions (chemicals = [ 'D052638' ])
+        exposures = self.query.get_exposure_conditions (chemicals = [ 'D052638' ])
         self.assertEqual (exposures[0]['chemical'], 'http://bio2rdf.org/mesh:D052638')
+    def test_show_provenance (self):
+        print ("BioChem query provenance:")
+        print (self.query.prov_json ())
 
 if __name__ == '__main__':
     unittest.main()
