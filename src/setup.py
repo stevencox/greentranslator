@@ -3,8 +3,13 @@ setup(
       name = 'greentranslator',
       packages = [ 'greentranslator' ], # this must be the same as the name above
       package_dir={ 'greentranslator' : 'greentranslator' },
-      package_data={ 'greentranslator' : [ 'query/*.sparql', 'swagger_client/*', swagger_client/models/*, swagger_client/apis/* ]},
-      version = '0.30',
+      package_data={ 'greentranslator' : [
+         'query/*.sparql',
+         'swagger_client/*',
+         'swagger_client/models/*',
+         'swagger_client/apis/*'
+      ]},
+      version = '0.31',
       description = 'Green Team BioMedical Data Translator',
       author = 'Steve Cox',
       author_email = 'scox@renci.org',
@@ -23,7 +28,7 @@ setup(
       ],
       include_package_data=True,
       url = 'https://github.com/stevencox/greentranslator.git',
-      download_url = 'https://github.com/stevencox/greentranslator/archive/0.30.tar.gz',
+      download_url = 'https://github.com/stevencox/greentranslator/archive/0.31.tar.gz',
       keywords = [ 'biomedical', 'environmental', 'exposure', 'clinical' ],
       classifiers = [ ],
     )

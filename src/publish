@@ -10,7 +10,12 @@ setup(
       name = 'greentranslator',
       packages = [ 'greentranslator' ], # this must be the same as the name above
       package_dir={ 'greentranslator' : 'greentranslator' },
-      package_data={ 'greentranslator' : [ 'query/*.sparql', 'swagger_client/*', swagger_client/models/*, swagger_client/apis/* ]},
+      package_data={ 'greentranslator' : [
+         'query/*.sparql',
+         'swagger_client/*',
+         'swagger_client/models/*',
+         'swagger_client/apis/*'
+      ]},
       version = '$version',
       description = 'Green Team BioMedical Data Translator',
       author = 'Steve Cox',
