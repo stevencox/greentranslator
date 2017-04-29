@@ -2,10 +2,10 @@ import json
 import logging
 import os
 import traceback
-import swagger_client
 import unittest
 from string import Template
-from swagger_client.rest import ApiException
+from .swagger_client import DefaultApi
+from .swagger_client.rest import ApiException
 from SPARQLWrapper import SPARQLWrapper2, JSON
 from greentranslator.provenance import provenance
 from greentranslator.provenance import ProvenanceQuery
@@ -252,7 +252,7 @@ class GreenTranslator (Translator):
             blaze_uri = 'http://stars-blazegraph.renci.org/bigdata/sparql'
         self.blazegraph = TripleStore (blaze_uri)
         #self.exposures_uri = self.config ['exposures_uri']
-        self.exposures = Exposures (swagger_client.DefaultApi ())
+        self.exposures = Exposures (DefaultApi ())
         self.biochem = BioChemical (self.blazegraph)
 
     def get_query (self):
