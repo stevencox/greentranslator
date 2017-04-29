@@ -5,8 +5,13 @@ greentranslator/__init__.py
 greentranslator/api.py
 greentranslator/l2.py
 greentranslator/livy.py
+greentranslator/provenance.py
 greentranslator/query/ctd_gene_expo_disease.sparql
 greentranslator/query/disease_drug_pathway.sparql
 greentranslator/query/expo_disease.sparql
 greentranslator/query/genes_pathways_by_disease.sparql
 greentranslator/query/get_drugs_by_disease.sparql
+greentranslator/swagger_client/__init__.py
+greentranslator/swagger_client/api_client.py
+greentranslator/swagger_client/configuration.py
+greentranslator/swagger_client/rest.py

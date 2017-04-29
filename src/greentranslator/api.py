@@ -262,29 +262,27 @@ class TestExposures(unittest.TestCase):
     query = GreenTranslator().get_query ()
     def test_coordinates(self):
         print ("Get available exposure coordinates.")
-        exposure = self.query. \
-                   expo_get_by_coordinates (exposure_type = 'pm25',
-                                            latitude      = '',
-                                            longitude     = '',
-                                            radius        = '0')
+        exposure = self.query.expo_get_by_coordinates (exposure_type = 'pm25',
+                                                       latitude      = '',
+                                                       longitude     = '',
+                                                       radius        = '0')
         self.assertEqual (exposure[0]['latitude'], '35.7795897')
     def test_scores(self):
         print ("Get exposure scores.")
-        scores = self.query. \
-                 expo_get_scores (exposure_type = 'pm25',
-                                  start_date = '2010-01-07',
-                                  end_date = '2010-01-31',
-                                  exposure_point = '35.9131996,-79.0558445')
+        scores = self.query.expo_get_scores (exposure_type = 'pm25',
+                                             start_date = '2010-01-07',
+                                             end_date = '2010-01-31',
+                                             exposure_point = '35.9131996,-79.0558445')
         self.assertEqual (scores[0].value, '4.714285714285714')
     def test_values(self):
         print ("Get exposure values")
-        values = self.query. \
-                 expo_get_values (exposure_type = 'pm25',
-                                  start_date = '2010-01-07',
-                                  end_date = '2010-01-31',
-                                  exposure_point = '35.9131996,-79.0558445')
+        values = self.query.expo_get_values (exposure_type = 'pm25',
+                                             start_date = '2010-01-07',
+                                             end_date = '2010-01-31',
+                                             exposure_point = '35.9131996,-79.0558445')
         self.assertEqual (values[0].value, '17.7199974060059')
     def test_show_provenance (self):
+        print ("Exposure query provenance:")
         print (self.query.prov_json ())
 
 class TestBioChem (unittest.TestCase):
