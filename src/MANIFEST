@@ -16,3 +16,10 @@ greentranslator/swagger_client/__init__.py~
 greentranslator/swagger_client/api_client.py
 greentranslator/swagger_client/configuration.py
 greentranslator/swagger_client/rest.py
+greentranslator/swagger_client/apis/__init__.py
+greentranslator/swagger_client/apis/default_api.py
+greentranslator/swagger_client/models/__init__.py
+greentranslator/swagger_client/models/coordinate.py
+greentranslator/swagger_client/models/date_range.py
+greentranslator/swagger_client/models/exposure.py
+greentranslator/swagger_client/models/exposure_type.py

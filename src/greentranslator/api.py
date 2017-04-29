@@ -6,8 +6,6 @@ import unittest
 from string import Template
 from .swagger_client import DefaultApi
 from .swagger_client.rest import ApiException
-#from exposures_client import DefaultApi
-#from exposures_client.rest import ApiException
 from SPARQLWrapper import SPARQLWrapper2, JSON
 from greentranslator.provenance import provenance
 from greentranslator.provenance import ProvenanceQuery
@@ -260,6 +258,15 @@ class GreenTranslator (Translator):
     def get_query (self):
         return GreenQuery (translator=self)
 
+class GreenTranslatorTest (unittest.TestCase):
+    def __init__(self, *args, **kwargs):
+#        unittest.TestCase.__init__() #self)
+#        super(GreenTranslatorTest, self)
+        unittest.TestCase.__init__(self, *args, **kwargs) #self)
+
+#import warnings
+#warnings.filterwarnings('ignore', message='.*Not importing directory .*')
+
 class TestExposures(unittest.TestCase):
     query = GreenTranslator().get_query ()
     def test_coordinates(self):
@@ -285,7 +292,14 @@ class TestExposures(unittest.TestCase):
         self.assertEqual (values[0].value, '17.7199974060059')
     def test_show_provenance (self):
         print ("Exposure query provenance:")
-        print (self.query.prov_json ())
+        #print (self.query.prov_json ())
+
+        prov = self.query.get_prov ()
+        get_scores = prov['activity']['expo_get_scores']
+        self.assertTrue ("prov:startTime" in get_scores)
+        self.assertTrue ("prov:endTime" in get_scores)
+        self.assertTrue ("TODO:id" in get_scores)
+        
 
 class TestBioChem (unittest.TestCase):
     query = GreenTranslator().get_query ()
@@ -306,7 +320,10 @@ class TestBioChem (unittest.TestCase):
         self.assertEqual (exposures[0]['chemical'], 'http://bio2rdf.org/mesh:D052638')
     def test_show_provenance (self):
         print ("BioChem query provenance:")
-        print (self.query.prov_json ())
+        #print (self.query.prov_json ())
+        prov = self.query.get_prov ()
+        execute_query = prov['activity']['execute_query']
+        self.assertTrue (len(execute_query) == 3)
 
 if __name__ == '__main__':
     unittest.main()

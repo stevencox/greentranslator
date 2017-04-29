@@ -1,5 +1,4 @@
-#from greentranslator import api
-#import swagger_client as exposures_client
+from greentranslator import api
 __all__ = [ 'swagger_client' ]
 
 
