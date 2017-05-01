@@ -12,9 +12,12 @@ setup(
       package_dir={ 'greentranslator' : 'greentranslator' },
       package_data={ 'greentranslator' : [
          'query/*.sparql',
-         'swagger_client/*',
-         'swagger_client/models/*',
-         'swagger_client/apis/*'
+         'exposures_api_client/*',
+         'exposures_api_client/models/*',
+         'exposures_api_client/apis/*',
+         'clinical_api_client/*',
+         'clinical_api_client/models/*',
+         'clinical_api_client/apis/*'
       ]},
       version = '$version',
       description = 'Green Team BioMedical Data Translator',
