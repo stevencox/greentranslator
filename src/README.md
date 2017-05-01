@@ -24,21 +24,8 @@ We're determining which operations on the Medical BioChemical data should be sou
 
 For ease of use at the Hackathon, we're providing a simple Python library interface to Green team services. It can be installed and tested like this:
    ```
-   $ cd dev
-   (venv3)$ source setup.sh
-   (venv3)$ pip install greentranslator
-   (venv3)$ python -m unittest greentranslator.api
-   Get available exposure coordinates.
-   .Get exposure scores.
-   .Get exposure values
-   .Test get drugs by condition
-   .Test get genes/pathways by condition
-   .Test get exposure conditions
-   .
-   ----------------------------------------------------------------------
-   Ran 6 tests in 4.563s
-
-   OK
+   pip --no-cache install greentranslator
+   python -m unittest greentranslator.api
    ```
    
 After this, Jupyter can be added like this:
@@ -51,6 +38,4 @@ And run with
 jupyter notebook --ip=0.0.0.0
 ```
 
-
 The current notebook exercises existing services to gather building blocks for executing the queries above.
-
