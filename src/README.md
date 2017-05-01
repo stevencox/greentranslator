@@ -37,5 +37,5 @@ And run with
 ```
 jupyter notebook --ip=0.0.0.0
 ```
+See the NCATS Translator Tangerine [cq-notebooks](https://github.com/NCATS-Tangerine/cq-notebooks) repository for usage examples.
 
-The current notebook exercises existing services to gather building blocks for executing the queries above.
