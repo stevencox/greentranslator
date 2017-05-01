@@ -24,7 +24,7 @@ We're determining which operations on the Medical BioChemical data should be sou
 
 For ease of use at the Hackathon, we're providing a simple Python library interface to Green team services. It can be installed and tested like this:
    ```
-   pip --no-cache install greentranslator
+   pip greentranslator
    python -m unittest greentranslator.api
    ```
    
