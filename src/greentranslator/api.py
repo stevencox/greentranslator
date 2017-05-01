@@ -4,8 +4,14 @@ import os
 import traceback
 import unittest
 from string import Template
-from .swagger_client import DefaultApi
-from .swagger_client.rest import ApiException
+#from .swagger_client import DefaultApi
+#from .swagger_client.rest import ApiException
+from .exposures_api_client import DefaultApi
+from .exposures_api_client.rest import ApiException
+
+from .clinical_api_client import ClinicalApi
+from .clinical_api_client.rest import ApiException
+
 from SPARQLWrapper import SPARQLWrapper2, JSON
 from greentranslator.provenance import provenance
 from greentranslator.provenance import ProvenanceQuery
@@ -234,6 +240,16 @@ class GreenQuery(ProvenanceQuery):
                                                      end_date = end_date,
                                                      exposure_point = exposure_point)
 
+    @provenance()
+    def clinical_get_patients (self, age, sex, race, location):
+        return self.translator.clinical.get_patients (age, sex, race, location)
+
+class Clinical(object):
+    def __init__(self, clinical_api):
+        self.clinical_api = clinical_api
+
+    def get_patients (self, age, sex, race, location):
+        return self.clinical_api.get_pet_by_id (age, sex, race, location)
 
 class GreenTranslator (Translator):
 
@@ -253,6 +269,7 @@ class GreenTranslator (Translator):
         self.blazegraph = TripleStore (blaze_uri)
         #self.exposures_uri = self.config ['exposures_uri']
         self.exposures = Exposures (DefaultApi ())
+        self.clinical = Clinical (ClinicalApi ())
         self.biochem = BioChemical (self.blazegraph)
 
     def get_query (self):
@@ -325,5 +342,12 @@ class TestBioChem (unittest.TestCase):
         execute_query = prov['activity']['execute_query']
         self.assertTrue (len(execute_query) == 3)
 
+class TestClinical (unittest.TestCase):
+    query = GreenTranslator().get_query ()
+    def test_get_patients (self):
+        print ("Clinical patient query")
+        patients = self.query.clinical_get_patients (age = 10, sex = 'M', race = '', location='35.9131996,-79.0558445')
+        print (patients)
+        
 if __name__ == '__main__':
     unittest.main()
