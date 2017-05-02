@@ -12,7 +12,7 @@ setup(
          'clinical_api_client/models/*',
          'clinical_api_client/apis/*'
       ]},
-      version = '0.36',
+      version = '0.37',
       description = 'Green Team BioMedical Data Translator',
       author = 'Steve Cox',
       author_email = 'scox@renci.org',
@@ -28,11 +28,12 @@ setup(
          'prov==1.5.0',
          'pydotplus==2.0.2',
          'seaborn==0.7.1',
-         'SPARQLWrapper==1.8.0'
+         'SPARQLWrapper==1.8.0',
+         'requests==2.13.0'
       ],
       include_package_data=True,
       url = 'https://github.com/stevencox/greentranslator.git',
-      download_url = 'https://github.com/stevencox/greentranslator/archive/0.36.tar.gz',
+      download_url = 'https://github.com/stevencox/greentranslator/archive/0.37.tar.gz',
       keywords = [ 'biomedical', 'environmental', 'exposure', 'clinical' ],
       classifiers = [ ],
     )
