@@ -1,6 +1,8 @@
+import requests
 import json
 import logging
 import os
+import socket
 import traceback
 import unittest
 from string import Template
@@ -15,6 +17,7 @@ from .clinical_api_client.rest import ApiException
 from SPARQLWrapper import SPARQLWrapper2, JSON
 from greentranslator.provenance import provenance
 from greentranslator.provenance import ProvenanceQuery
+from uuid import getnode as get_mac
 
 class LoggingUtil(object):
     """ Logging utility controlling format and setting initial logging level """
@@ -248,8 +251,16 @@ class Clinical(object):
     def __init__(self, clinical_api):
         self.clinical_api = clinical_api
 
+    def get_patients0 (self, age, sex, race, location):
+        x = self.clinical_api.get_pet_by_id (age, sex, race, location)
+        print (x)
+        return x
+#        return self.clinical_api.get_pet_by_id (age, sex, race, location)
+
     def get_patients (self, age, sex, race, location):
-        return self.clinical_api.get_pet_by_id (age, sex, race, location)
+        url = Template ("http://tweetsie.med.unc.edu/CLINICAL_EXPOSURE/age/${age}/sex/${sex}/race/${race}/location/${location}")
+        r = requests.get(url.substitute (age = age, sex = sex, race = race, location = location))
+        return r.json ()
 
 class GreenTranslator (Translator):
 
@@ -345,11 +356,18 @@ class TestBioChem (unittest.TestCase):
 class TestClinical (unittest.TestCase):
     query = GreenTranslator().get_query ()
     def test_get_patients (self):
-        print ("Clinical patient query")
-        pass
-        #patients = self.query.clinical_get_patients (age = 10, sex = 'M', race = '', location='35.9131996,-79.0558445')
-        #print (patients)
-        print ("Skipping clinical API ...")
+        hackathon_mac = 2773026512788
+        hostname = socket.gethostname()
+        #if hostname == 'translator.ncats.io':
+        if hackathon_mac == get_mac ():
+            print ("Clinical patient query")
+            patients = self.query.clinical_get_patients (age = 10, sex = 'male', race = 'other', location='emergency')
+            print (patients)
+            print (json.dumps (json.loads (str(patients).replace ("'", '"')), indent=2))
+            self.assertTrue ('geoCode' in patients[0])
+            print (patients)
+        else:
+            print ("Skipping clinical API since mac:{0} is not an allowed clinical API host.".format (hackathon_mac))
 
 if __name__ == '__main__':
     unittest.main()
