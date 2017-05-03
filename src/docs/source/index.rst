@@ -12,22 +12,13 @@ greentranslator\.api module
     :undoc-members:
     :show-inheritance:
 
-greentranslator\.l2 module
---------------------------
+greentranslator\.provenance module
+----------------------------------
 
-.. automodule:: greentranslator.l2
+.. automodule:: greentranslator.provenance
     :members:
     :undoc-members:
     :show-inheritance:
-
-greentranslator\.livy module
-----------------------------
-
-.. automodule:: greentranslator.livy
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 
 Module contents
 ---------------

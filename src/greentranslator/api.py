@@ -73,10 +73,12 @@ class Exposures (object):
         """ Returns paginated list of available latitude, longitude coordinates for given exposure_type.
             Optionally the user can provide a latitude, longitude coordinate with a radius in meters to
             discover if an exposure location is within the requested range
+
         :param exposure_type: Type of exposure (pm25, o3)
         :param latitude: Float representing a latitude.
         :param longitude: Float representing a longitude.
-        :param radius: Radius in meters."""
+        :param radius: Radius in meters.
+        """
         result = self.exposures. \
                   exposures_exposure_type_coordinates_get(exposure_type,
                                                           latitude=latitude,
@@ -178,13 +180,25 @@ class BioChemical(object):
 
 class GreenQuery(ProvenanceQuery):
 
+    """ The GreenQuery interface is the preferred endpoint for querying Green services.
+        As a ProvenanceQuery, it collects data about each invocation in a W3C PROV structure.
+        For more information, 
+        1. The GitHub Project: https://github.com/stevencox/greentranslator
+        2. Information on the Clinical API: https://github.com/NCATS-Tangerine/cq-notebooks/tree/master/GreenTeam_Data_Documentation
+        3. The Exposure API: https://exposures.renci.org/v1/ui/#/
+        4. The Blazegraph endpoint underlying the biochem API: http://stars-blazegraph.renci.org/blazegraph/#query
+    """
     def __init__(self, translator):
         ProvenanceQuery.__init__(self)
         self.translator = translator
 
     @provenance()
     def query_biochem (self, query):
-        """ Execute and return the result of a SPARQL query. """
+        """ Execute and return the result of a SPARQL query.
+
+        :param query: A valid SPARQL query referencing namespaces in the data store.
+        :return: Returns a structured bindings object containing dicts indexed by query output parameter name.
+        """
         return self.translator.biochem.query_biochem (query)
 
     @provenance()
@@ -214,10 +228,13 @@ class GreenQuery(ProvenanceQuery):
         """ Returns paginated list of available latitude, longitude coordinates for given exposure_type.
             Optionally the user can provide a latitude, longitude coordinate with a radius in meters to
             discover if an exposure location is within the requested range
+
         :param exposure_type: Type of exposure (pm25, o3)
         :param latitude: Float representing a latitude.
         :param longitude: Float representing a longitude.
-        :param radius: Radius in meters."""
+        :param radius: Radius in meters.
+
+        """
         return self.translator.exposures.get_by_coordinates (exposure_type = exposure_type,
                                                              latitude = latitude,
                                                              longitude = longitude,
@@ -238,6 +255,14 @@ class GreenQuery(ProvenanceQuery):
 
     @provenance()
     def expo_get_values (self, exposure_type, start_date, end_date, exposure_point):
+        """ Retrieve the computed exposure value(s) for a given environmental exposure factor, time period, and location(s)
+        
+        :param exposure_type: The name of the exposure factor (pm25, o3)
+        :param start_date: The starting date to obtain exposures for (example 1985-04-12 is April 12th 1985). Time of day is ignored.
+        :param end_date: The ending date to obtain exposures for (example 1985-04-13 is April 13th 1985)
+        :param exposure_point: A description of the location(s) to retrieve the exposure for. Locaton may be a single geocoordinate (example '35.720278,-79.176389') or a semicolon separated list of geocoord:dayhours giving the start and ending hours on specific days of the week at that location (example '35.720278,-79.176389,Sa0813;35.720278,-79.176389,other') 
+
+        """
         return self.translator.exposures.get_values (exposure_type = exposure_type,
                                                      start_date = start_date,
                                                      end_date = end_date,
@@ -245,6 +270,24 @@ class GreenQuery(ProvenanceQuery):
 
     @provenance()
     def clinical_get_patients (self, age, sex, race, location):
+        """ The Green Team’s Clinical Data Service API provides defined access to
+        clinical data on ~16,000 ‘HuSH+’ patients with an ‘asthma-like’ phenotype.
+        Users can select input parameters, and the service returns select output
+        based on the input parameters. The input parameters are: age; sex; race;
+        type of visit; and specific ICD and CPT codes1. Based on the input
+        parameters, the service returns the following outpatient parameters: (1) a
+        list of patient IDs and dates of ED and outpatient visits over the 12-month
+        period after diagnosis; and (2) a list of medications prescribed over the
+        12-month period after diagnosis. The output data are stratified by patients
+        with ≤2 or >2 ED visits over the 12-month period after diagnosis—the primary
+        clinical endpoint used to define, respectively, patients who are
+        ‘responsive’ and ‘non-responsive’ to treatment.
+
+        :param age: Age of patients to retrieve
+        :param sex: Patient sex
+        :param race: Patient race
+        :param location: Location.
+        """
         return self.translator.clinical.get_patients (age, sex, race, location)
 
 class Clinical(object):
@@ -252,12 +295,12 @@ class Clinical(object):
         self.clinical_api = clinical_api
 
     def get_patients0 (self, age, sex, race, location):
-        x = self.clinical_api.get_pet_by_id (age, sex, race, location)
-        print (x)
-        return x
-#        return self.clinical_api.get_pet_by_id (age, sex, race, location)
+        """ Get patients via the swagger genereated client stub. Broken for now. """
+        return self.clinical_api.get_pet_by_id (age, sex, race, location)
 
     def get_patients (self, age, sex, race, location):
+        """ Call the clinical API the old fashioned way until the Swagger spec is fixed. 
+        """
         url = Template ("http://tweetsie.med.unc.edu/CLINICAL_EXPOSURE/age/${age}/sex/${sex}/race/${race}/location/${location}")
         r = requests.get(url.substitute (age = age, sex = sex, race = race, location = location))
         return r.json ()

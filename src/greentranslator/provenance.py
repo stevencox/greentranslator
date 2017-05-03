@@ -1,6 +1,7 @@
 """ This part is generic provenance infrastructure """
 
 import importlib
+from functools import wraps
 import json 
 import prov.model as prov
 from datetime import datetime
@@ -218,6 +219,7 @@ def parse_sparql_query_provenance (prov_obj, function, args, kwargs, start, end)
 
 def provenance (data_source=None):
     def provenance_aspect (function):
+        @wraps(function)
         def wrapper (*args, **kwargs):
             func_name = function.__name__
             a_self = args[0]
