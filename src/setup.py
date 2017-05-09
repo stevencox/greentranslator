@@ -10,9 +10,12 @@ setup(
          'exposures_api_client/apis/*',
          'clinical_api_client/*',
          'clinical_api_client/models/*',
-         'clinical_api_client/apis/*'
+         'clinical_api_client/apis/*',
+         'broad_pgm_translator/*',
+         'broad_pgm_translator/models/*',
+         'broad_pgm_translator/apis/*'
       ]},
-      version = '0.37',
+      version = '0.38',
       description = 'Green Team BioMedical Data Translator',
       author = 'Steve Cox',
       author_email = 'scox@renci.org',
@@ -33,7 +36,7 @@ setup(
       ],
       include_package_data=True,
       url = 'https://github.com/stevencox/greentranslator.git',
-      download_url = 'https://github.com/stevencox/greentranslator/archive/0.37.tar.gz',
+      download_url = 'https://github.com/stevencox/greentranslator/archive/0.38.tar.gz',
       keywords = [ 'biomedical', 'environmental', 'exposure', 'clinical' ],
       classifiers = [ ],
     )
