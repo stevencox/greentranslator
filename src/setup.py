@@ -32,7 +32,7 @@ setup(
          'pydotplus==2.0.2',
          'seaborn==0.7.1',
          'SPARQLWrapper==1.8.0',
-         'requests==2.13.0'
+         'requests==2.20.0'
       ],
       include_package_data=True,
       url = 'https://github.com/stevencox/greentranslator.git',
