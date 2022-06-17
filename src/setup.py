@@ -26,7 +26,7 @@ setup(
          'setuptools >= 21.0.0',
          'urllib3 >= 1.15.1',
          'bokeh==0.12.5',
-         'numpy==1.12.1',
+         'numpy==1.21.0',
          'pandas==0.19.2',
          'prov==1.5.0',
          'pydotplus==2.0.2',
